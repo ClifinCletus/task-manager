@@ -121,7 +121,6 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   }
 }
 
-/* Custom Scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
 }

@@ -24,7 +24,7 @@ export default function Home() {
     const [isFormVisible, setIsFormVisible] = useState(false);
     const [editingTask, setEditingTask] = useState(null);
 
-    // Filter and Sort State
+    
     const [filters, setFilters] = useState({
         search: "",
         status: "",
@@ -33,7 +33,7 @@ export default function Home() {
         sort: "newest"
     });
 
-    // Derived State: Filtering and Sorting
+    
     const filteredTasks = useMemo(() => {
         let result = [...tasks];
 

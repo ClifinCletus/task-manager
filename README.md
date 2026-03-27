@@ -1,36 +1,70 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Task Manager
 
-## Getting Started
+A robust task management dashboard built with Next.js, Redux, and Firebase. This application provides a centralized interface for tracking activities, managing deadlines, and prioritizing essential work within a dark, high-contrast UI.
 
-First, run the development server:
+## 🛠️ Tech Stack
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- **Framework**: Next.js 16 (App Router)
+- **State Management**: Redux Toolkit (Thunks for async logic)
+- **Backend**: Firebase (Authentication & Firestore)
+- **Styling**: Scoped CSS Modules
+- **Library Support**: React Icons, React Hot Toast
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## ✨ Dynamic Features
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+- **Redux-Powered State**: Centralized task and auth state management with asyncThunks for data fetching and updates through specialized Redux slices and custom hooks (`useTasks`, `useAuth`).
+- **Firebase Integration**: 
+    - Full authentication system (Sign-up/Login).
+    - Real-time task persistence and Firestore CRUD operations.
+    - security measures for protected access.
+- **Task Lifecycle Management**:
+    - Manage task status (Todo, In Progress, Done).
+    - Urgency levels (High, Medium, Low) with visual indicators.
+    - Single-tag categorization system.
+    - Deadline support with custom date formatting.
+- **Task Prioritization**:
+    - Pin critical tasks to the top of your list.
+    - Automated limit: You can pin a maximum of 2 tasks simultaneously to maintain focus.
+- **Search & Advanced Filtering**:
+    - Real-time search by task title or description.
+    - Filter by Status, Urgency, or Tag.
+    - Multi-way sorting: Newest First, Oldest First, or by Deadline distance.
+- **Live Stats Dashboard**: Instant overview of your total activities vs. completed tasks.
+- **Feedback & Validation**:
+    - Toast notifications for every action (success/error).
+    - Client-side form validation for task creation and updates.
+- **Mobile Responsive**: Dark theme UI optimized for various screen sizes using a custom CSS variable system.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## � Getting Started
 
-## Learn More
+### 1. Installation
+   ```bash
+   npm install
+   ```
 
-To learn more about Next.js, take a look at the following resources:
+### 2. Environment Variables
+   Create a `.env.local` file in the root directory:
+   ```env
+   NEXT_PUBLIC_FIREBASE_API_KEY=your_key
+   NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your_domain
+   NEXT_PUBLIC_FIREBASE_PROJECT_ID=your_id
+   NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your_bucket
+   NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
+   NEXT_PUBLIC_FIREBASE_APP_ID=your_id
+   ```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### 3. Usage
+   ```bash
+   npm run dev
+   ```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 🏗️ Project Architecture
 
-## Deploy on Vercel
+- **`/src/hooks`**: Custom logic for tasks and authentication.
+- **`/src/redux`**: Global store configuration and async slices.
+- **`/src/components`**: Reusable task cards, forms, and filtering UI.
+- **`/src/services`**: Firebase initialization and Firestore references.
+- **`/src/utils`**: provider for protectedRoutes
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+Developed by [Clifin Cletus](https://github.com/ClifinCletus)

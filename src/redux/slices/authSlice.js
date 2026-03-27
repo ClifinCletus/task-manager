@@ -28,7 +28,6 @@ const getErrorMessage = (error) => {
     }
 };
 
-// SIGNUP
 export const signupUser = createAsyncThunk(
     "auth/signupUser",
     async ({ email, password }, thunkAPI) => {
@@ -47,7 +46,6 @@ export const signupUser = createAsyncThunk(
     }
 );
 
-// LOGIN
 export const loginUser = createAsyncThunk(
     "auth/loginUser",
     async ({ email, password }, thunkAPI) => {
@@ -66,7 +64,6 @@ export const loginUser = createAsyncThunk(
     }
 );
 
-// LOGOUT
 export const logout = createAsyncThunk(
     "auth/logout",
     async () => {
@@ -79,13 +76,13 @@ const authSlice = createSlice({
     initialState: {
         user: null,
         loading: false,
-        isAuthReady: false, // NEW: track if Firebase has initially checked auth state
+        isAuthReady: false, //track if Firebase has initially checked auth state
         error: null,
     },
     reducers: {
         setUser: (state, action) => {
             state.user = action.payload;
-            state.isAuthReady = true; // Once auth check returns, we are ready
+            state.isAuthReady = true; // Once auth check returns, its ready
         },
     },
     extraReducers: (builder) => {

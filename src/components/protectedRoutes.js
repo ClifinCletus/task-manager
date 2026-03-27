@@ -9,13 +9,11 @@ export default function ProtectedRoute({ children }) {
     const router = useRouter();
 
     useEffect(() => {
-        // Only redirect if auth check is complete AND no user is found
         if (isAuthReady && !user) {
             router.push("/login");
         }
     }, [user, isAuthReady, router]);
 
-    // Show nothing/spinner until we know the auth state
     if (!isAuthReady) {
         return (
             <div style={{
@@ -25,7 +23,7 @@ export default function ProtectedRoute({ children }) {
                 justifyContent: 'center',
                 backgroundColor: 'var(--background)'
             }}>
-                {/* Standard noir-styled simple pulse loader */}
+                {/* Standard simple pulse loader */}
                 <div style={{
                     width: '40px',
                     height: '40px',
