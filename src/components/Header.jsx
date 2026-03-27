@@ -1,19 +1,17 @@
 "use client";
 
-import { useDispatch, useSelector } from "react-redux";
-import { logout } from "@/redux/slices/authSlice";
+import { useAuth } from "@/hooks/useAuth";
 import { useRouter } from "next/navigation";
 import { FiLogOut, FiUser } from "react-icons/fi";
 import styles from "./Header.module.css";
 
 export default function Header() {
-    const { user } = useSelector((state) => state.auth);
-    const dispatch = useDispatch();
+    const { user, logout } = useAuth();
     const router = useRouter();
 
     const handleLogout = async () => {
         try {
-            await dispatch(logout());
+            await logout();
             router.push("/login");
         } catch (error) {
             console.error("Logout failed:", error.message);

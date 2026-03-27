@@ -1,20 +1,25 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
-import { useSelector, useDispatch } from "react-redux";
-import toast from "react-hot-toast";
+import { useState, useMemo } from "react";
 import ProtectedRoute from "@/components/protectedRoutes";
 import TaskForm from "@/components/TaskForm";
 import TaskList from "@/components/TaskList";
 import TaskFilters from "@/components/TaskFilters";
-import { createTask, fetchTasks, updateTask, deleteTask } from "@/redux/slices/taskSlice";
+import { useAuth } from "@/hooks/useAuth";
+import { useTasks } from "@/hooks/useTasks";
 import { FiPlus, FiX } from "react-icons/fi";
 import styles from "./page.module.css";
 
 export default function Home() {
-    const dispatch = useDispatch();
-    const { user } = useSelector((state) => state.auth);
-    const { tasks, loading: taskLoading } = useSelector((state) => state.tasks);
+    const { user } = useAuth();
+    const {
+        tasks,
+        loading: taskLoading,
+        addTask,
+        updateTask,
+        deleteTask,
+        togglePin
+    } = useTasks(user?.uid);
 
     const [isFormVisible, setIsFormVisible] = useState(false);
     const [editingTask, setEditingTask] = useState(null);
@@ -28,14 +33,7 @@ export default function Home() {
         sort: "newest"
     });
 
-    // Initial Fetch of tasks
-    useEffect(() => {
-        if (user) {
-            dispatch(fetchTasks());
-        }
-    }, [dispatch, user]);
-
-    // Derived State: Filtering and Sorting Logic
+    // Derived State: Filtering and Sorting
     const filteredTasks = useMemo(() => {
         let result = [...tasks];
 
@@ -47,28 +45,16 @@ export default function Home() {
             );
         }
 
-        if (filters.status) {
-            result = result.filter(t => t.status === filters.status);
-        }
-
-        if (filters.urgency) {
-            result = result.filter(t => t.urgency === filters.urgency);
-        }
-
-        if (filters.tag) {
-            result = result.filter(t => t.tags && t.tags.includes(filters.tag));
-        }
+        if (filters.status) result = result.filter(t => t.status === filters.status);
+        if (filters.urgency) result = result.filter(t => t.urgency === filters.urgency);
+        if (filters.tag) result = result.filter(t => t.tags && t.tags.includes(filters.tag));
 
         result.sort((a, b) => {
             if (a.pinned && !b.pinned) return -1;
             if (!a.pinned && b.pinned) return 1;
 
-            if (filters.sort === "newest") {
-                return new Date(b.createdAt || 0) - new Date(a.createdAt || 0);
-            }
-            if (filters.sort === "oldest") {
-                return new Date(a.createdAt || 0) - new Date(b.createdAt || 0);
-            }
+            if (filters.sort === "newest") return new Date(b.createdAt || 0) - new Date(a.createdAt || 0);
+            if (filters.sort === "oldest") return new Date(a.createdAt || 0) - new Date(b.createdAt || 0);
             if (filters.sort === "deadline") {
                 const dateA = a.deadline ? new Date(a.deadline) : new Date(8640000000000000);
                 const dateB = b.deadline ? new Date(b.deadline) : new Date(8640000000000000);
@@ -81,74 +67,22 @@ export default function Home() {
     }, [tasks, filters]);
 
     const handleFormSubmit = async (taskData) => {
-        const loadingToast = toast.loading(editingTask ? "Updating task..." : "Creating task...");
         try {
             if (editingTask) {
-                const result = await dispatch(updateTask({ id: editingTask.id, taskData }));
-                if (updateTask.fulfilled.match(result)) {
-                    toast.success("Task updated!", { id: loadingToast });
-                    setIsFormVisible(false);
-                    setEditingTask(null);
-                } else {
-                    toast.error(result.payload || "Update failed.", { id: loadingToast });
-                }
+                await updateTask(editingTask.id, taskData);
+                setEditingTask(null);
             } else {
-                const result = await dispatch(createTask(taskData));
-                if (createTask.fulfilled.match(result)) {
-                    toast.success("Task created!", { id: loadingToast });
-                    setIsFormVisible(false);
-                } else {
-                    toast.error(result.payload || "Creation failed.", { id: loadingToast });
-                }
+                await addTask(taskData);
             }
+            setIsFormVisible(false);
         } catch (error) {
-            toast.error(error.message || "An unexpected error occurred.", { id: loadingToast });
+            // Error already handled by toast in hook
         }
     };
 
     const handleEditTask = (task) => {
         setEditingTask(task);
         setIsFormVisible(true);
-    };
-
-    const handleDeleteTask = async (id) => {
-        if (window.confirm("Are you sure?")) {
-            const loadingToast = toast.loading("Removing task...");
-            const result = await dispatch(deleteTask(id));
-            if (deleteTask.fulfilled.match(result)) {
-                toast.success("Task removed.", { id: loadingToast });
-            } else {
-                toast.error(result.payload || "Removal failed.", { id: loadingToast });
-            }
-        }
-    };
-
-    const handleToggleStatus = async (id, nextStatus) => {
-        const loadingToast = toast.loading(`Moving to ${nextStatus}...`);
-        const result = await dispatch(updateTask({ id, taskData: { status: nextStatus } }));
-        if (updateTask.fulfilled.match(result)) {
-            toast.success("Status updated.", { id: loadingToast });
-        } else {
-            toast.error(result.payload || "Update failed.", { id: loadingToast });
-        }
-    };
-
-    const handlePinToggle = async (task) => {
-        const currentlyPinned = tasks.filter(t => t.pinned).length;
-
-        if (!task.pinned && currentlyPinned >= 2) {
-            toast.error("Maximum 2 tasks can be pinned.");
-            return;
-        }
-
-        const loadingToast = toast.loading(task.pinned ? "Unpinning..." : "Pinning to top...");
-        const result = await dispatch(updateTask({ id: task.id, taskData: { pinned: !task.pinned } }));
-
-        if (updateTask.fulfilled.match(result)) {
-            toast.success(task.pinned ? "Task unpinned." : "Task pinned to top!", { id: loadingToast });
-        } else {
-            toast.error(result.payload || "Action failed.", { id: loadingToast });
-        }
     };
 
     const handleCancel = () => {
@@ -211,9 +145,9 @@ export default function Home() {
                             <TaskList
                                 tasks={filteredTasks}
                                 onEdit={handleEditTask}
-                                onDelete={handleDeleteTask}
-                                onStatusChange={handleToggleStatus}
-                                onPinToggle={handlePinToggle}
+                                onDelete={deleteTask}
+                                onStatusChange={(id, status) => updateTask(id, { status })}
+                                onPinToggle={togglePin}
                             />
                         </section>
                     </>
