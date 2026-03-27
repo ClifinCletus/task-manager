@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import styles from "./TaskForm.module.css";
 
+const PREDEFINED_TAGS = ["Work", "Home", "Study", "Personal", "Health", "Finance"];
 
 export default function TaskForm({ onSubmit, initialData = null, loading = false }) {
     const isEditMode = !!initialData;
@@ -10,18 +11,23 @@ export default function TaskForm({ onSubmit, initialData = null, loading = false
     const [form, setForm] = useState({
         title: "",
         description: "",
-        status: "Todo"
+        status: "Todo",
+        urgency: "Medium",
+        tags: [],
+        deadline: ""
     });
 
     const [errors, setErrors] = useState({});
 
-    // Populating initial data for edit mode
     useEffect(() => {
         if (initialData) {
             setForm({
                 title: initialData.title || "",
                 description: initialData.description || "",
-                status: initialData.status || "Todo"
+                status: initialData.status || "Todo",
+                urgency: initialData.urgency || "Medium",
+                tags: Array.isArray(initialData.tags) ? initialData.tags : [],
+                deadline: initialData.deadline || ""
             });
         }
     }, [initialData]);
@@ -30,10 +36,19 @@ export default function TaskForm({ onSubmit, initialData = null, loading = false
         const { name, value } = e.target;
         setForm((prev) => ({ ...prev, [name]: value }));
 
-        // Clearing error for the field when user types
         if (errors[name]) {
             setErrors((prev) => ({ ...prev, [name]: "" }));
         }
+    };
+
+    const toggleTag = (tag) => {
+        setForm((prev) => {
+            const isSelected = prev.tags.includes(tag);
+            const newTags = isSelected
+                ? prev.tags.filter(t => t !== tag)
+                : [...prev.tags, tag];
+            return { ...prev, tags: newTags };
+        });
     };
 
     const validate = () => {
@@ -67,12 +82,12 @@ export default function TaskForm({ onSubmit, initialData = null, loading = false
                         {isEditMode ? "Update Task" : "Create New Task"}
                     </h2>
                     <p className={styles.subtitle}>
-                        {isEditMode ? "Modify your task details below." : "Organize your workflow by adding a task."}
+                        {isEditMode ? "Refine your milestone details." : "Structure your next move with specific details."}
                     </p>
                 </header>
 
                 <form className={styles.form} onSubmit={handleSubmit}>
-                    
+
                     <div className={styles.formGroup}>
                         <label className={styles.label} htmlFor="title">Task Title</label>
                         <input
@@ -88,30 +103,81 @@ export default function TaskForm({ onSubmit, initialData = null, loading = false
                         {errors.title && <span className={styles.errorMessage}>{errors.title}</span>}
                     </div>
 
-                  
-                    <div className={styles.formGroup}>
-                        <label className={styles.label} htmlFor="status">Current Status</label>
-                        <select
-                            id="status"
-                            name="status"
-                            className={styles.select}
-                            value={form.status}
-                            onChange={handleChange}
-                            disabled={loading}
-                        >
-                            <option value="Todo">Todo</option>
-                            <option value="In Progress">In Progress</option>
-                            <option value="Done">Done</option>
-                        </select>
+
+                    <div className={styles.row}>
+                        <div className={styles.formGroup}>
+                            <label className={styles.label} htmlFor="status">Status</label>
+                            <select
+                                id="status"
+                                name="status"
+                                className={styles.select}
+                                value={form.status}
+                                onChange={handleChange}
+                                disabled={loading}
+                            >
+                                <option value="Todo">Todo</option>
+                                <option value="In Progress">In Progress</option>
+                                <option value="Done">Done</option>
+                            </select>
+                        </div>
+
+                        <div className={styles.formGroup}>
+                            <label className={styles.label} htmlFor="urgency">Urgency</label>
+                            <select
+                                id="urgency"
+                                name="urgency"
+                                className={styles.select}
+                                value={form.urgency}
+                                onChange={handleChange}
+                                disabled={loading}
+                            >
+                                <option value="Low">Low</option>
+                                <option value="Medium">Medium</option>
+                                <option value="High">High</option>
+                            </select>
+                        </div>
                     </div>
 
-                    
+                    <div className={styles.row}>
+                        <div className={styles.formGroup}>
+                            <label className={styles.label}>Select Tags</label>
+                            <div className={styles.tagCloud}>
+                                {PREDEFINED_TAGS.map(tag => (
+                                    <button
+                                        key={tag}
+                                        type="button"
+                                        onClick={() => toggleTag(tag)}
+                                        className={`${styles.tagOption} ${form.tags.includes(tag) ? styles.tagActive : ""}`}
+                                        disabled={loading}
+                                    >
+                                        {tag}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+
+                        <div className={styles.formGroup}>
+                            <label className={styles.label} htmlFor="deadline">Deadline (optional)</label>
+                            <input
+                                id="deadline"
+                                name="deadline"
+                                type="date"
+                                className={styles.input}
+                                value={form.deadline}
+                                min={new Date().toISOString().split('T')[0]}
+                                onChange={handleChange}
+                                disabled={loading}
+                            />
+                        </div>
+                    </div>
+
+
                     <div className={styles.formGroup}>
                         <label className={styles.label} htmlFor="description">Task Description</label>
                         <textarea
                             id="description"
                             name="description"
-                            placeholder="Add some details about this task..."
+                            placeholder="Add some context or steps..."
                             className={`${styles.textarea} ${errors.description ? styles.inputError : ""}`}
                             value={form.description}
                             onChange={handleChange}
@@ -120,7 +186,7 @@ export default function TaskForm({ onSubmit, initialData = null, loading = false
                         {errors.description && <span className={styles.errorMessage}>{errors.description}</span>}
                     </div>
 
-                    
+
                     <button className={styles.submitBtn} type="submit" disabled={loading}>
                         {loading ? (isEditMode ? "Updating..." : "Saving...") : (isEditMode ? "Update Task" : "Create Task")}
                     </button>

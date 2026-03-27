@@ -5,7 +5,13 @@ import StatusBadge from "./StatusBadge";
 
 export default function TaskCard({ task, onEdit, onDelete }) {
 
-    // Simple SVG Icons for standard Noir UI
+    // Formatting Firestore date string
+    const formatDate = (dateStr) => {
+        if (!dateStr) return "";
+        return new Date(dateStr).toLocaleDateString();
+    };
+
+    // Icons
     const EditIcon = () => (
         <svg viewBox="0 0 24 24" className={styles.icon} fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
@@ -22,32 +28,58 @@ export default function TaskCard({ task, onEdit, onDelete }) {
         </svg>
     );
 
+    const getUrgencyClass = (urgency) => {
+        switch (urgency) {
+            case "High": return styles.high;
+            case "Medium": return styles.medium;
+            case "Low": return styles.low;
+            default: return "";
+        }
+    };
+
     return (
         <article className={styles.card}>
             <header className={styles.header}>
-                <h3 className={styles.title}>{task.title}</h3>
-                <StatusBadge status={task.status} />
+                <div className={styles.topInfo}>
+                    <StatusBadge status={task.status} />
+                    {task.createdAt && <span className={styles.date}>Created: {formatDate(task.createdAt)}</span>}
+                </div>
+                <div className={`${styles.urgencyDot} ${getUrgencyClass(task.urgency)}`} title={`Urgency: ${task.urgency}`}></div>
             </header>
 
-            <p className={styles.description}>
-                {task.description || "No description provided."}
-            </p>
+            <div className={styles.content}>
+                <h3 className={styles.title}>{task.title}</h3>
+                <p className={styles.description}>
+                    {task.description || "No description provided."}
+                </p>
+
+                {task.tags && task.tags.length > 0 && (
+                    <div className={styles.tagGroup}>
+                        {task.tags.map((tag, idx) => (
+                            <span key={idx} className={styles.tag}>#{tag}</span>
+                        ))}
+                    </div>
+                )}
+            </div>
 
             <footer className={styles.footer}>
-                <button
-                    onClick={() => onEdit(task)}
-                    className={`${styles.actionBtn} ${styles.editBtn}`}
-                    aria-label="Edit task"
-                >
-                    <EditIcon />
-                </button>
-                <button
-                    onClick={() => onDelete(task.id)}
-                    className={`${styles.actionBtn} ${styles.deleteBtn}`}
-                    aria-label="Delete task"
-                >
-                    <TrashIcon />
-                </button>
+                {task.deadline && <span className={styles.deadline}>Deadline: {formatDate(task.deadline)}</span>}
+                <div className={styles.actionGroup}>
+                    <button
+                        onClick={() => onEdit(task)}
+                        className={`${styles.actionBtn} ${styles.editBtn}`}
+                        aria-label="Edit task"
+                    >
+                        <EditIcon />
+                    </button>
+                    <button
+                        onClick={() => onDelete(task.id)}
+                        className={`${styles.actionBtn} ${styles.deleteBtn}`}
+                        aria-label="Delete task"
+                    >
+                        <TrashIcon />
+                    </button>
+                </div>
             </footer>
         </article>
     );

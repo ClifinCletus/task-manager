@@ -94,6 +94,11 @@
     opacity: 0.7;
 }
 
+input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+  cursor: pointer;
+}
+
 .inputError {
     border-color: #ef4444 !important;
 }
@@ -130,7 +135,53 @@
     cursor: not-allowed;
 }
 
+.tagCloud {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    padding-top: 0.25rem;
+}
+
+.tagOption {
+    padding: 0.5rem 0.875rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--muted-foreground);
+    background-color: var(--secondary);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    transition: all 0.2s;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.tagOption:hover:not(:disabled) {
+    border-color: var(--foreground);
+    color: var(--foreground);
+}
+
+.tagActive {
+    background-color: var(--primary);
+    color: var(--primary-foreground);
+    border-color: var(--primary);
+}
+
+.row {
+    display: flex;
+    gap: 1.5rem;
+    width: 100%;
+}
+
+.row>div {
+    flex: 1;
+}
+
 @media (max-width: 640px) {
+    .row {
+        flex-direction: column;
+        gap: 1.75rem;
+    }
+
     .card {
         padding: 2rem 1.25rem;
         border: none;
