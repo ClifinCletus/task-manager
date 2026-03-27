@@ -66,7 +66,7 @@ export const loginUser = createAsyncThunk(
     }
 );
 
-// LOGOUT - Renamed to logout to match Header.jsx
+// LOGOUT
 export const logout = createAsyncThunk(
     "auth/logout",
     async () => {
@@ -79,11 +79,13 @@ const authSlice = createSlice({
     initialState: {
         user: null,
         loading: false,
+        isAuthReady: false, // NEW: track if Firebase has initially checked auth state
         error: null,
     },
     reducers: {
         setUser: (state, action) => {
             state.user = action.payload;
+            state.isAuthReady = true; // Once auth check returns, we are ready
         },
     },
     extraReducers: (builder) => {
@@ -96,6 +98,7 @@ const authSlice = createSlice({
             .addCase(signupUser.fulfilled, (state, action) => {
                 state.loading = false;
                 state.user = action.payload;
+                state.isAuthReady = true;
             })
             .addCase(signupUser.rejected, (state, action) => {
                 state.loading = false;
@@ -110,6 +113,7 @@ const authSlice = createSlice({
             .addCase(loginUser.fulfilled, (state, action) => {
                 state.loading = false;
                 state.user = action.payload;
+                state.isAuthReady = true;
             })
             .addCase(loginUser.rejected, (state, action) => {
                 state.loading = false;
@@ -119,6 +123,7 @@ const authSlice = createSlice({
             // logout
             .addCase(logout.fulfilled, (state) => {
                 state.user = null;
+                state.isAuthReady = true;
             });
     },
 });

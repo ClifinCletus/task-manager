@@ -39,7 +39,6 @@ export default function Home() {
     const filteredTasks = useMemo(() => {
         let result = [...tasks];
 
-        // 1. Search Filter
         if (filters.search.trim()) {
             const query = filters.search.toLowerCase();
             result = result.filter(t =>
@@ -48,28 +47,22 @@ export default function Home() {
             );
         }
 
-        // 2. Status Filter
         if (filters.status) {
             result = result.filter(t => t.status === filters.status);
         }
 
-        // 3. Urgency Filter
         if (filters.urgency) {
             result = result.filter(t => t.urgency === filters.urgency);
         }
 
-        // 4. Tag Filter
         if (filters.tag) {
             result = result.filter(t => t.tags && t.tags.includes(filters.tag));
         }
 
-        // 5. Sorting Logic (Pinned first, then selected sort)
         result.sort((a, b) => {
-            // Rule: Pinned tasks always win first
             if (a.pinned && !b.pinned) return -1;
             if (!a.pinned && b.pinned) return 1;
 
-            // Then follow selected sort order within the pinned/unpinned groups
             if (filters.sort === "newest") {
                 return new Date(b.createdAt || 0) - new Date(a.createdAt || 0);
             }
@@ -97,7 +90,7 @@ export default function Home() {
                     setIsFormVisible(false);
                     setEditingTask(null);
                 } else {
-                    toast.error("Update failed.", { id: loadingToast });
+                    toast.error(result.payload || "Update failed.", { id: loadingToast });
                 }
             } else {
                 const result = await dispatch(createTask(taskData));
@@ -105,11 +98,11 @@ export default function Home() {
                     toast.success("Task created!", { id: loadingToast });
                     setIsFormVisible(false);
                 } else {
-                    toast.error("Creation failed.", { id: loadingToast });
+                    toast.error(result.payload || "Creation failed.", { id: loadingToast });
                 }
             }
         } catch (error) {
-            toast.error("Unexpected error.", { id: loadingToast });
+            toast.error(error.message || "An unexpected error occurred.", { id: loadingToast });
         }
     };
 
@@ -125,7 +118,7 @@ export default function Home() {
             if (deleteTask.fulfilled.match(result)) {
                 toast.success("Task removed.", { id: loadingToast });
             } else {
-                toast.error("Removal failed.", { id: loadingToast });
+                toast.error(result.payload || "Removal failed.", { id: loadingToast });
             }
         }
     };
@@ -136,7 +129,7 @@ export default function Home() {
         if (updateTask.fulfilled.match(result)) {
             toast.success("Status updated.", { id: loadingToast });
         } else {
-            toast.error("Update failed.", { id: loadingToast });
+            toast.error(result.payload || "Update failed.", { id: loadingToast });
         }
     };
 
@@ -154,7 +147,7 @@ export default function Home() {
         if (updateTask.fulfilled.match(result)) {
             toast.success(task.pinned ? "Task unpinned." : "Task pinned to top!", { id: loadingToast });
         } else {
-            toast.error("Action failed.", { id: loadingToast });
+            toast.error(result.payload || "Action failed.", { id: loadingToast });
         }
     };
 

@@ -17,7 +17,7 @@ export const fetchTasks = createAsyncThunk(
 
             const q = query(
                 collection(db, "tasks"),
-                where("uid", "==", user.uid)
+                where("userId", "==", user.uid)
             );
 
             const querySnapshot = await getDocs(q);
@@ -33,6 +33,7 @@ export const fetchTasks = createAsyncThunk(
     }
 );
 
+
 export const createTask = createAsyncThunk(
     "tasks/createTask",
     async (taskData, thunkAPI) => {
@@ -43,6 +44,7 @@ export const createTask = createAsyncThunk(
                 throw new Error("User not authenticated");
             }
 
+
             const docRef = await addDoc(collection(db, "tasks"), {
                 ...taskData,
                 userId: user.uid,
@@ -52,9 +54,11 @@ export const createTask = createAsyncThunk(
             return {
                 id: docRef.id,
                 ...taskData,
-                uid: user.uid,
+                userId: user.uid,
+                createdAt: new Date().toISOString()
             };
         } catch (err) {
+            //push the specific Firestore error back to the UI toast
             return thunkAPI.rejectWithValue(err.message);
         }
     }
@@ -72,6 +76,7 @@ export const updateTask = createAsyncThunk(
         }
     }
 );
+
 
 export const deleteTask = createAsyncThunk(
     "tasks/deleteTask",
@@ -93,13 +98,10 @@ const taskSlice = createSlice({
         setTasks: (state, action) => {
             state.tasks = action.payload;
         },
-        addTaskLocal: (state, action) => {
-            state.tasks.push(action.payload);
-        },
     },
     extraReducers: (builder) => {
         builder
-            // fetch
+
             .addCase(fetchTasks.pending, (state) => {
                 state.loading = true;
                 state.error = null;
@@ -108,7 +110,7 @@ const taskSlice = createSlice({
                 state.loading = false;
                 state.tasks = action.payload.map(task => {
                     const t = { ...task };
-                    if (t.createdAt && t.createdAt.toDate) {
+                    if (t.createdAt && typeof t.createdAt.toDate === 'function') {
                         t.createdAt = t.createdAt.toDate().toISOString();
                     }
                     return t;
@@ -119,7 +121,7 @@ const taskSlice = createSlice({
                 state.error = action.payload;
             })
 
-            // create
+
             .addCase(createTask.pending, (state) => {
                 state.loading = true;
                 state.error = null;
@@ -133,7 +135,7 @@ const taskSlice = createSlice({
                 state.error = action.payload;
             })
 
-            // update
+
             .addCase(updateTask.pending, (state) => {
                 state.loading = true;
                 state.error = null;
@@ -150,7 +152,7 @@ const taskSlice = createSlice({
                 state.error = action.payload;
             })
 
-            // delete
+
             .addCase(deleteTask.pending, (state) => {
                 state.loading = true;
                 state.error = null;
@@ -166,5 +168,5 @@ const taskSlice = createSlice({
     },
 });
 
-export const { setTasks, addTaskLocal } = taskSlice.actions;
+export const { setTasks } = taskSlice.actions;
 export default taskSlice.reducer;
