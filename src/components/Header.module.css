@@ -12,10 +12,8 @@
     align-items: center;
 }
 
-@media (prefers-color-scheme: dark) {
-    .header {
-        background: rgba(0, 0, 0, 0.75);
-    }
+[data-theme='dark'] .header {
+    background: rgba(20, 20, 22, 0.85);
 }
 
 .nav {

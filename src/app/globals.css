@@ -17,31 +17,50 @@
   --destructive-foreground: #fafafa;
   --border: #e2e8f0;
   --input: #e2e8f0;
-  --radius: 10px;
+  --radius: 12px;
+  --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+  --shadow-hover: 0 12px 20px -8px rgba(0, 0, 0, 0.15);
+
+  /* Badge colors */
+  --badge-todo-bg: #fef2f2;
+  --badge-todo-text: #991b1b;
+  --badge-progress-bg: #eff6ff;
+  --badge-progress-text: #1e40af;
+  --badge-done-bg: #f0fdf4;
+  --badge-done-text: #166534;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #000000;
-    --foreground: #f8fafc;
-    --card: #09090b;
-    --card-foreground: #f8fafc;
-    --popover: #09090b;
-    --popover-foreground: #f8fafc;
-    --primary: #f8fafc;
-    --primary-foreground: #020617;
-    --secondary: #111113;
-    --secondary-foreground: #f8fafc;
-    --muted: #111113;
-    --muted-foreground: #94a3b8;
-    --accent: #111113;
-    --accent-foreground: #f8fafc;
-    --destructive: #7f1d1d;
-    --destructive-foreground: #f8fafc;
-    --border: #1e1e20;
-    --input: #1e1e20;
-    --ring: #94a3b8;
-  }
+[data-theme='dark'] {
+  --background: #000000;
+  --foreground: #f8fafc;
+  --card: #1c1c1e;
+  --card-foreground: #f8fafc;
+  --popover: #1c1c1e;
+  --popover-foreground: #f8fafc;
+  --primary: #f8fafc;
+  --primary-foreground: #020617;
+  --secondary: #242426;
+  --secondary-foreground: #f8fafc;
+  --muted: #242426;
+  --muted-foreground: #a1a1aa;
+  --accent: #242426;
+  --accent-foreground: #f8fafc;
+  --destructive: #dc2626;
+  --destructive-foreground: #f8fafc;
+  --border: #333336;
+  --input: #333336;
+  --ring: #a1a1aa;
+  --shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.05);
+  --shadow-hover: 0 20px 40px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.1);
+
+
+  
+  --badge-todo-bg: #3d1414;
+  --badge-todo-text: #febaba;
+  --badge-progress-bg: #14223d;
+  --badge-progress-text: #bad0fe;
+  --badge-done-bg: #143d22;
+  --badge-done-text: #bafece;
 }
 
 * {
@@ -51,22 +70,22 @@
   -webkit-font-smoothing: antialiased;
 }
 
-html,
 body {
   height: 100%;
   width: 100%;
   color: var(--foreground);
-  background: var(--background);
+  background-color: var(--background);
+  background-image:
+    radial-gradient(circle at 50% 10%, #f1f5f9 0%, #e2e8f0 100%);
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
   line-height: 1.5;
   background-attachment: fixed;
 }
 
-@media (prefers-color-scheme: dark) {
-  body {
-    /* Rich Deep Canvas - Differentiated from cards */
-    background: radial-gradient(circle at 50% 10%, #09090b 0%, #000000 100%);
-  }
+[data-theme='dark'] body {
+  background-image:
+    radial-gradient(circle at 50% 0%, #000000 0%, #000000 100%);
+  background-color: #000000;
 }
 
 h1,
@@ -105,6 +124,12 @@ input:focus,
 select:focus,
 textarea:focus {
   border-color: var(--foreground);
+  box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.05);
+}
+
+[data-theme='dark'] input:focus,
+[data-theme='dark'] select:focus,
+[data-theme='dark'] textarea:focus {
   box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.05);
 }
 
@@ -115,10 +140,8 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   transition: opacity 0.2s;
 }
 
-@media (prefers-color-scheme: dark) {
-  input[type="date"]::-webkit-calendar-picker-indicator {
-    filter: invert(0.8) brightness(1.2);
-  }
+[data-theme='dark'] input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(0.8) brightness(1.2);
 }
 
 ::-webkit-scrollbar {

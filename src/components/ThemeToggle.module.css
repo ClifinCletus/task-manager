@@ -1,0 +1,23 @@
+.themeToggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    background-color: var(--secondary);
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    color: var(--foreground);
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.themeToggle:hover {
+    border-color: var(--foreground);
+    background-color: var(--muted);
+    transform: scale(1.05);
+}
+
+.themeToggle:active {
+    transform: scale(0.95);
+}

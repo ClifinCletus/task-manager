@@ -7,23 +7,20 @@
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    border: 1px solid transparent;
+    border: 1px solid var(--border);
 }
 
 .todo {
-    background-color: #fef2f2;
-    color: #991b1b;
-    border-color: #fecaca;
+    background-color: var(--badge-todo-bg);
+    color: var(--badge-todo-text);
 }
 
 .inProgress {
-    background-color: #eff6ff;
-    color: #1e40af;
-    border-color: #bfdbfe;
+    background-color: var(--badge-progress-bg);
+    color: var(--badge-progress-text);
 }
 
 .done {
-    background-color: #f0fdf4;
-    color: #166534;
-    border-color: #bbf7d0;
+    background-color: var(--badge-done-bg);
+    color: var(--badge-done-text);
 }

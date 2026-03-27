@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import { FiLogOut, FiUser } from "react-icons/fi";
 import styles from "./Header.module.css";
 
+import ThemeToggle from "./ThemeToggle";
+
 export default function Header() {
     const { user, logout } = useAuth();
     const router = useRouter();
@@ -26,6 +28,7 @@ export default function Header() {
                 <h1 className={styles.logo}>TaskFlow</h1>
 
                 <div className={styles.userSection}>
+                    <ThemeToggle />
                     <div className={styles.userInfo}>
                         <FiUser className={styles.userIcon} />
                         <span className={styles.email}>{user.email}</span>
