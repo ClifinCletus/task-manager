@@ -45,7 +45,7 @@ export const createTask = createAsyncThunk(
 
             const docRef = await addDoc(collection(db, "tasks"), {
                 ...taskData,
-                uid: user.uid,
+                userId: user.uid,
                 createdAt: serverTimestamp(),
             });
 
