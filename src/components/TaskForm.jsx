@@ -44,9 +44,8 @@ export default function TaskForm({ onSubmit, initialData = null, loading = false
     const toggleTag = (tag) => {
         setForm((prev) => {
             const isSelected = prev.tags.includes(tag);
-            const newTags = isSelected
-                ? prev.tags.filter(t => t !== tag)
-                : [...prev.tags, tag];
+            // Single selection logic: toggle the clicked tag, others are cleared
+            const newTags = isSelected ? [] : [tag];
             return { ...prev, tags: newTags };
         });
     };
