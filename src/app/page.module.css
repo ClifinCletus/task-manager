@@ -1,37 +1,36 @@
 .container {
-    max-width: 1200px;
+    max-width: 1000px;
     margin: 0 auto;
-    padding: 3rem 1.5rem 6rem;
-    min-height: calc(100vh - 4.5rem);
+    padding: 4rem 1.5rem 10rem;
+    min-height: 100vh;
     display: flex;
     flex-direction: column;
-    gap: 2.5rem;
-    /* Increased spacing between sections */
+    gap: 3.5rem;
 }
 
-/* Header Section */
+
 .dashboardHeader {
     display: flex;
     justify-content: space-between;
     align-items: flex-end;
-    margin-bottom: 0.5rem;
+    margin-bottom: -1rem;
 }
 
 .welcomeTitle {
-    font-size: 2.5rem;
-    font-weight: 900;
+    font-size: 2.75rem;
+    font-weight: 850;
     color: var(--foreground);
+    line-height: 0.85;
+    
     letter-spacing: -0.06em;
-    /* Tight Noir aesthetic */
-    line-height: 0.9;
-    margin-bottom: 0.625rem;
+    margin-bottom: 0.75rem;
 }
 
 .welcomeSubtitle {
-    font-size: 0.9375rem;
+    font-size: 0.875rem;
     color: var(--muted-foreground);
-    font-weight: 500;
-    letter-spacing: -0.01em;
+    font-weight: 600;
+    letter-spacing: 0.02em;
 }
 
 .controls {
@@ -39,75 +38,72 @@
     gap: 0.75rem;
 }
 
-/* Buttons */
-.createBtn,
-.cancelBtn {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.75rem 1.5rem;
-    font-size: 0.875rem;
-    font-weight: 700;
-    border-radius: 9999px;
-    cursor: pointer;
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-}
 
 .createBtn {
-    background-color: var(--foreground);
+    background: var(--foreground);
     color: var(--background);
-    border: 1px solid var(--foreground);
+    padding: 0.625rem 1.5rem;
+    height: 3rem;
+    font-size: 0.8125rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .createBtn:hover {
-    background-color: transparent;
-    color: var(--foreground);
     transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
 }
 
 .cancelBtn {
-    background-color: transparent;
     border: 1.5px solid var(--border);
+    padding: 0.625rem 1.5rem;
+    height: 3rem;
+    font-size: 0.8125rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    border-radius: 8px;
     color: var(--muted-foreground);
 }
 
 .cancelBtn:hover {
-    border-color: var(--foreground);
     color: var(--foreground);
-    transform: translateY(-1px);
+    border-color: var(--foreground);
 }
 
-/* Stats Row - High End Glass Cards */
+
 .statsGrid {
-    display: flex;
-    gap: 1.25rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
     width: 100%;
 }
 
 .statCard {
-    background: var(--card);
+    background-color: var(--card);
+    
     border: 1px solid var(--border);
     border-radius: var(--radius);
-    padding: 1.75rem 2rem;
-    flex: 1;
+    padding: 2rem;
     display: flex;
-    align-items: center;
     justify-content: space-between;
-    transition: all 0.3s ease;
-    cursor: default;
+    align-items: flex-start;
+    transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
 .statCard:hover {
-    transform: scale(1.02);
-    border-color: var(--foreground);
+    transform: translateY(-2px);
+    border-color: var(--muted-foreground);
+    border-width: 1.5px;
 }
 
 .statInfo {
     display: flex;
     flex-direction: column;
-    gap: 0.375rem;
+    gap: 0.5rem;
 }
 
 .statLabel {
@@ -115,19 +111,19 @@
     font-weight: 800;
     color: var(--muted-foreground);
     text-transform: uppercase;
-    letter-spacing: 0.1em;
+    letter-spacing: 0.12em;
 }
 
 .statValue {
     font-size: 2.25rem;
     font-weight: 900;
     color: var(--foreground);
-    letter-spacing: -0.06em;
+    line-height: 1;
+    letter-spacing: -0.05em;
 }
 
 .statValueAlt {
     color: #10b981;
-    /* Emerald for completion */
 }
 
 /* Sections */
@@ -135,35 +131,22 @@
 .formSection {
     display: flex;
     flex-direction: column;
-    gap: 2rem;
-    animation: fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+    gap: 2.5rem;
 }
 
 @media (max-width: 768px) {
     .container {
-        padding: 2rem 1rem;
+        padding: 3rem 1.25rem 6rem;
+    }
+
+    .statsGrid {
+        grid-template-columns: 1fr;
     }
 
     .dashboardHeader {
         flex-direction: column;
         align-items: flex-start;
-        gap: 1.5rem;
-    }
-
-    .statsGrid {
-        flex-direction: column;
+        gap: 2rem;
     }
 
     .welcomeTitle {

@@ -37,7 +37,6 @@
     display: flex;
     flex-direction: column;
     gap: 2rem;
-    /* Vertical spacing between groups */
 }
 
 .row {
@@ -50,7 +49,6 @@
     display: flex;
     flex-direction: column;
     gap: 0.875rem;
-    /* THE GAP BETWEEN LABEL AND INPUT */
 }
 
 .label {
@@ -106,7 +104,7 @@
     }
 }
 
-/* Tags Fix */
+
 .tagCloud {
     display: flex;
     flex-wrap: wrap;
@@ -120,7 +118,7 @@
     border-radius: 6px;
     background-color: var(--secondary);
     color: var(--foreground);
-    /* ENSURE VISIBILITY */
+    
     font-size: 0.75rem;
     font-weight: 700;
     cursor: pointer;
@@ -139,7 +137,7 @@
     background-color: var(--muted);
 }
 
-/* Submit Button */
+
 .submitBtn {
     width: 100%;
     height: 3.25rem;

@@ -3,7 +3,6 @@
     top: 0;
     z-index: 50;
     width: 100%;
-    /* Standard Glass effect */
     background: rgba(255, 255, 255, 0.82);
     backdrop-filter: blur(14px);
     border-bottom: 1px solid var(--border);
@@ -33,7 +32,7 @@
     font-size: 1.25rem;
     font-weight: 900;
     letter-spacing: -0.06em;
-    /* Extremely tight logo spacing */
+
     background: linear-gradient(to right, var(--foreground), var(--muted-foreground));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -53,7 +52,6 @@
     padding: 0.5rem 0.875rem;
     background-color: var(--secondary);
     border-radius: 9999px;
-    /* Pill shape */
     border: 1px solid var(--border);
     color: var(--muted-foreground);
     font-size: 0.8125rem;
@@ -97,6 +95,5 @@
 @media (max-width: 640px) {
     .userInfo {
         display: none;
-        /* Hide email on mobile for cleaner look */
     }
 }

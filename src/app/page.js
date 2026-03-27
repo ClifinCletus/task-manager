@@ -167,7 +167,7 @@ export default function Home() {
                             Hey, {user.email.split('@')[0]}
                         </h2>
                         <p className={styles.welcomeSubtitle}>
-                            {isFormVisible ? (editingTask ? "Refine your milestone" : "Structure your next move") : "Ready to flow?"}
+                            {isFormVisible ? (editingTask ? "Refine your task" : "Structure your next task") : "Ready to task up?"}
                         </p>
                     </div>
 
@@ -191,7 +191,7 @@ export default function Home() {
                         <section className={styles.statsGrid}>
                             <div className={styles.statCard}>
                                 <div className={styles.statInfo}>
-                                    <span className={styles.statLabel}>Active Focus</span>
+                                    <span className={styles.statLabel}>Total Tasks</span>
                                     <div className={styles.statValue}>{tasks.length}</div>
                                 </div>
                             </div>

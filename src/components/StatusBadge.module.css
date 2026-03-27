@@ -27,7 +27,3 @@
     color: #166534;
     border-color: #bbf7d0;
 }
-
-/* Dark mode adjustments in the module or via globals are handled by CSS variables if we use them, but these are specific colors. 
-   I'll make them slightly more muted for dark mode if I can, but I'll stick to a clean standard first.
-*/
