@@ -26,7 +26,14 @@ export function useTasks(userId) {
         try {
             if (!userId) throw new Error("User unauthorized");
             await dispatch(addTaskThunk({ ...taskData, userId })).unwrap();
-            toast.success("Task created successfully!");
+            toast.success("Task created successfully!", {
+                style: {
+                    background: '#fff',
+                    color: '#000',
+                    border: '2px solid #000',
+                    fontWeight: '800'
+                }
+            });
         } catch (err) {
             toast.error(err.message || "Failed to create task");
             throw err;
@@ -36,7 +43,14 @@ export function useTasks(userId) {
     const updateTask = useCallback(async (taskId, updates) => {
         try {
             await dispatch(updateTaskThunk({ id: taskId, ...updates })).unwrap();
-            toast.success("Task updated!");
+            toast.success("Task updated!", {
+                style: {
+                    background: '#fff',
+                    color: '#000',
+                    border: '2px solid #000',
+                    fontWeight: '800'
+                }
+            });
         } catch (err) {
             toast.error(err.message || "Update failed");
             throw err;
