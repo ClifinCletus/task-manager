@@ -5,7 +5,7 @@ import { useSelector, useDispatch } from "react-redux";
 import ProtectedRoute from "@/components/protectedRoutes";
 import TaskForm from "@/components/TaskForm";
 import TaskList from "@/components/TaskList";
-import { createTask, fetchTasks } from "@/redux/slices/taskSlice";
+import { createTask, fetchTasks, updateTask, deleteTask } from "@/redux/slices/taskSlice";
 import styles from "./page.module.css";
 
 export default function Home() {
@@ -14,6 +14,7 @@ export default function Home() {
     const { tasks, loading: taskLoading } = useSelector((state) => state.tasks);
 
     const [isFormVisible, setIsFormVisible] = useState(false);
+    const [editingTask, setEditingTask] = useState(null);
 
     // Initial Fetch of tasks
     useEffect(() => {
@@ -22,21 +23,37 @@ export default function Home() {
         }
     }, [dispatch, user]);
 
-    const handleCreateTask = async (taskData) => {
-        const result = await dispatch(createTask(taskData));
-        if (createTask.fulfilled.match(result)) {
-            setIsFormVisible(false);
+    const handleFormSubmit = async (taskData) => {
+        if (editingTask) {
+            // Update existing task
+            const result = await dispatch(updateTask({ id: editingTask.id, taskData }));
+            if (updateTask.fulfilled.match(result)) {
+                setIsFormVisible(false);
+                setEditingTask(null);
+            }
+        } else {
+            // Create new task
+            const result = await dispatch(createTask(taskData));
+            if (createTask.fulfilled.match(result)) {
+                setIsFormVisible(false);
+            }
         }
     };
 
     const handleEditTask = (task) => {
-        // Edit functionality placeholder
-        console.log("Edit Task:", task);
+        setEditingTask(task);
+        setIsFormVisible(true);
     };
 
     const handleDeleteTask = (id) => {
-        // Delete functionality placeholder
-        console.log("Delete Task ID:", id);
+        if (window.confirm("Are you sure you want to delete this task?")) {
+            dispatch(deleteTask(id));
+        }
+    };
+
+    const handleCancel = () => {
+        setIsFormVisible(false);
+        setEditingTask(null);
     };
 
     if (!user) return null;
@@ -51,7 +68,7 @@ export default function Home() {
                             Hey, {user.email.split('@')[0]}
                         </h2>
                         <p className={styles.welcomeSubtitle}>
-                            {isFormVisible ? "Structure your next move" : "Ready to flow?"}
+                            {isFormVisible ? (editingTask ? "Refine your milestone" : "Structure your next move") : "Ready to flow?"}
                         </p>
                     </div>
 
@@ -65,7 +82,7 @@ export default function Home() {
                             </button>
                         ) : (
                             <button
-                                onClick={() => setIsFormVisible(false)}
+                                onClick={handleCancel}
                                 className={styles.cancelBtn}
                             >
                                 Cancel
@@ -81,7 +98,7 @@ export default function Home() {
                         <section className={styles.statsGrid}>
                             <div className={styles.statCard}>
                                 <div className={styles.statInfo}>
-                                    <span className={styles.statLabel}>Active</span>
+                                    <span className={styles.statLabel}>Active Focus</span>
                                     <div className={styles.statValue}>{tasks.length}</div>
                                 </div>
                             </div>
@@ -107,8 +124,9 @@ export default function Home() {
                 ) : (
                     <section className={styles.formSection}>
                         <TaskForm
-                            onSubmit={handleCreateTask}
+                            onSubmit={handleFormSubmit}
                             loading={taskLoading}
+                            initialData={editingTask}
                         />
                     </section>
                 )}
