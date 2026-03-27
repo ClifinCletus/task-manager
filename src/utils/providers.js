@@ -21,13 +21,12 @@ function AuthWrapper({ children }) {
                     email: user.email,
                     displayName: user.displayName,
                 }));
-                // If on login or signup page, redirect to home
+                
                 if (pathname === "/login" || pathname === "/signup") {
                     router.push("/");
                 }
             } else {
                 dispatch(setUser(null));
-                // If not on login or signup page, redirect to login
                 if (pathname !== "/login" && pathname !== "/signup") {
                     router.push("/login");
                 }

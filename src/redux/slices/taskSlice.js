@@ -66,7 +66,7 @@ export const createTask = createAsyncThunk(
 
 export const updateTask = createAsyncThunk(
     "tasks/updateTask",
-    async ({ id, taskData }, thunkAPI) => {
+    async ({ id, ...taskData }, thunkAPI) => {
         try {
             const taskDocRef = doc(db, "tasks", id);
             await updateDoc(taskDocRef, taskData);
