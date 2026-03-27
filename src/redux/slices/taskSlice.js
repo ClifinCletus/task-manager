@@ -1,12 +1,37 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { db, auth } from "@/services/firebase";
-import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+import { collection, addDoc, getDocs, query, where, serverTimestamp } from "firebase/firestore";
 
 const initialState = {
     tasks: [],
     loading: false,
     error: null,
 };
+
+export const fetchTasks = createAsyncThunk(
+    "tasks/fetchTasks",
+    async (_, thunkAPI) => {
+        try {
+            const user = auth.currentUser;
+            if (!user) throw new Error("User not authenticated");
+
+            const q = query(
+                collection(db, "tasks"),
+                where("uid", "==", user.uid)
+            );
+
+            const querySnapshot = await getDocs(q);
+            const tasks = querySnapshot.docs.map((doc) => ({
+                id: doc.id,
+                ...doc.data(),
+            }));
+
+            return tasks;
+        } catch (err) {
+            return thunkAPI.rejectWithValue(err.message);
+        }
+    }
+);
 
 export const createTask = createAsyncThunk(
     "tasks/createTask",
@@ -48,6 +73,27 @@ const taskSlice = createSlice({
     },
     extraReducers: (builder) => {
         builder
+            // fetch
+            .addCase(fetchTasks.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(fetchTasks.fulfilled, (state, action) => {
+                state.loading = false;
+                // Simple conversion for createdAt timestamp from Firestore to serializable string if exists
+                state.tasks = action.payload.map(task => {
+                    const t = { ...task };
+                    if (t.createdAt && t.createdAt.toDate) {
+                        t.createdAt = t.createdAt.toDate().toISOString();
+                    }
+                    return t;
+                });
+            })
+            .addCase(fetchTasks.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload;
+            })
+
             //pending
             .addCase(createTask.pending, (state) => {
                 state.loading = true;
