@@ -1,16 +1,24 @@
 "use client";
 
-import { useSelector, useDispatch } from "react-redux";
-import { logoutUser } from "@/redux/slices/authSlice";
-import Link from "next/link";
+import { useDispatch, useSelector } from "react-redux";
+import { logout } from "@/redux/slices/authSlice";
+import { useRouter } from "next/navigation";
+import { FiLogOut, FiUser } from "react-icons/fi";
 import styles from "./Header.module.css";
 
 export default function Header() {
-    const dispatch = useDispatch();
     const { user } = useSelector((state) => state.auth);
+    const dispatch = useDispatch();
+    const router = useRouter();
 
-    const handleLogout = () => {
-        dispatch(logoutUser());
+    const handleLogout = async () => {
+        try {
+            // The logout thunk already handles Firebase signOut and state clearing
+            await dispatch(logout());
+            router.push("/login");
+        } catch (error) {
+            console.error("Logout failed:", error.message);
+        }
     };
 
     if (!user) return null;
@@ -18,23 +26,16 @@ export default function Header() {
     return (
         <header className={styles.header}>
             <nav className={styles.nav}>
-                <div className={styles.logoArea}>
-                    <Link href="/" className={styles.logo}>
-                        ProTask
-                    </Link>
-                </div>
+                <h1 className={styles.logo}>TaskFlow</h1>
 
-                <div className={styles.userArea}>
+                <div className={styles.userSection}>
                     <div className={styles.userInfo}>
-                        <span className={styles.userName}>
-                            {user.email.split('@')[0]}
-                        </span>
-                        <span className={styles.userEmail}>
-                            {user.email}
-                        </span>
+                        <FiUser className={styles.userIcon} />
+                        <span className={styles.email}>{user.email}</span>
                     </div>
                     <button onClick={handleLogout} className={styles.logoutBtn}>
-                        Logout
+                        <FiLogOut size={16} />
+                        <span>Logout</span>
                     </button>
                 </div>
             </nav>

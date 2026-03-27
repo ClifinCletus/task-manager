@@ -1,11 +1,13 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import ProtectedRoute from "@/components/protectedRoutes";
 import TaskForm from "@/components/TaskForm";
 import TaskList from "@/components/TaskList";
+import TaskFilters from "@/components/TaskFilters";
 import { createTask, fetchTasks, updateTask, deleteTask } from "@/redux/slices/taskSlice";
+import { FiPlus, FiX } from "react-icons/fi";
 import styles from "./page.module.css";
 
 export default function Home() {
@@ -16,6 +18,15 @@ export default function Home() {
     const [isFormVisible, setIsFormVisible] = useState(false);
     const [editingTask, setEditingTask] = useState(null);
 
+    // Filter and Sort State
+    const [filters, setFilters] = useState({
+        search: "",
+        status: "",
+        urgency: "",
+        tag: "",
+        sort: "newest"
+    });
+
     // Initial Fetch of tasks
     useEffect(() => {
         if (user) {
@@ -23,16 +34,61 @@ export default function Home() {
         }
     }, [dispatch, user]);
 
+    // Derived State: Filtering and Sorting Logic
+    const filteredTasks = useMemo(() => {
+        let result = [...tasks];
+
+        // 1. Search Filter
+        if (filters.search.trim()) {
+            const query = filters.search.toLowerCase();
+            result = result.filter(t =>
+                t.title.toLowerCase().includes(query) ||
+                (t.description && t.description.toLowerCase().includes(query))
+            );
+        }
+
+        // 2. Status Filter
+        if (filters.status) {
+            result = result.filter(t => t.status === filters.status);
+        }
+
+        // 3. Urgency Filter
+        if (filters.urgency) {
+            result = result.filter(t => t.urgency === filters.urgency);
+        }
+
+        // 4. Tag Filter
+        if (filters.tag) {
+            result = result.filter(t => t.tags && t.tags.includes(filters.tag));
+        }
+
+        // 5. Sorting Logic
+        result.sort((a, b) => {
+            if (filters.sort === "newest") {
+                return new Date(b.createdAt || 0) - new Date(a.createdAt || 0);
+            }
+            if (filters.sort === "oldest") {
+                return new Date(a.createdAt || 0) - new Date(b.createdAt || 0);
+            }
+            if (filters.sort === "deadline") {
+                const dateA = a.deadline ? new Date(a.deadline) : new Date(8640000000000000);
+                const dateB = b.deadline ? new Date(b.deadline) : new Date(8640000000000000);
+                return dateA - dateB;
+            }
+            return 0;
+        });
+
+        return result;
+    }, [tasks, filters]);
+
     const handleFormSubmit = async (taskData) => {
         if (editingTask) {
-            // Update existing task
             const result = await dispatch(updateTask({ id: editingTask.id, taskData }));
             if (updateTask.fulfilled.match(result)) {
                 setIsFormVisible(false);
                 setEditingTask(null);
             }
         } else {
-            // Create new task
             const result = await dispatch(createTask(taskData));
             if (createTask.fulfilled.match(result)) {
                 setIsFormVisible(false);
@@ -78,13 +134,15 @@ export default function Home() {
                                 onClick={() => setIsFormVisible(true)}
                                 className={styles.createBtn}
                             >
-                                + New Task
+                                <FiPlus style={{ marginRight: '8px' }} />
+                                New Task
                             </button>
                         ) : (
                             <button
                                 onClick={handleCancel}
                                 className={styles.cancelBtn}
                             >
+                                <FiX style={{ marginRight: '8px' }} />
                                 Cancel
                             </button>
                         )}
@@ -112,10 +170,12 @@ export default function Home() {
                             </div>
                         </section>
 
-                        {/* Responsive Task Grid */}
+                        {/* Search and Filters Section */}
                         <section className={styles.listSection}>
+                            <TaskFilters filters={filters} setFilters={setFilters} />
+
                             <TaskList
-                                tasks={tasks}
+                                tasks={filteredTasks}
                                 onEdit={handleEditTask}
                                 onDelete={handleDeleteTask}
                             />

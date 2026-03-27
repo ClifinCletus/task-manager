@@ -66,9 +66,9 @@ export const loginUser = createAsyncThunk(
     }
 );
 
-// LOGOUT
-export const logoutUser = createAsyncThunk(
-    "auth/logoutUser",
+// LOGOUT - Renamed to logout to match Header.jsx
+export const logout = createAsyncThunk(
+    "auth/logout",
     async () => {
         await signOut(auth);
     }
@@ -117,7 +117,7 @@ const authSlice = createSlice({
             })
 
             // logout
-            .addCase(logoutUser.fulfilled, (state) => {
+            .addCase(logout.fulfilled, (state) => {
                 state.user = null;
             });
     },

@@ -62,9 +62,37 @@
     margin-top: 0.25rem;
 }
 
+.userSection {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.userInfo {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    color: var(--muted-foreground);
+    font-size: 0.8125rem;
+    font-weight: 500;
+}
+
+.userIcon {
+    font-size: 1rem;
+    color: var(--foreground);
+    opacity: 0.8;
+}
+
+.email {
+    letter-spacing: -0.01em;
+}
+
 .logoutBtn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
     padding: 0.625rem 1.25rem;
-    background-color: rgb(164, 164, 227);
+    background-color: var(--secondary);
     border: 1px solid var(--border);
     color: var(--foreground);
     font-size: 0.75rem;
