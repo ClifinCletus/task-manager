@@ -1,60 +1,83 @@
 "use client";
 
-import { useSelector } from "react-redux";
+import { useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
 import ProtectedRoute from "@/components/protectedRoutes";
+import TaskForm from "@/components/TaskForm";
+import { createTask } from "@/redux/slices/taskSlice";
+import styles from "./page.module.css";
 
 export default function Home() {
+    const dispatch = useDispatch();
     const { user } = useSelector((state) => state.auth);
+    const { tasks, loading: taskLoading } = useSelector((state) => state.tasks);
+
+    const [isFormVisible, setIsFormVisible] = useState(false);
+
+    const handleCreateTask = async (taskData) => {
+        const result = await dispatch(createTask(taskData));
+        if (createTask.fulfilled.match(result)) {
+            setIsFormVisible(false);
+        }
+    };
 
     if (!user) return null;
 
     return (
         <ProtectedRoute>
-            <main style={{ padding: "2rem", maxWidth: "1280px", margin: "0 auto" }}>
-                <div style={{
-                    padding: "2.5rem",
-                    backgroundColor: "var(--card)",
-                    border: "1px solid var(--border)",
-                    borderRadius: "var(--radius)",
-                    boxShadow: "var(--shadow-md)",
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: "1.5rem"
-                }}>
-                    <div style={{ display: "flex", flexDirection: "column", gap: "0.25rem" }}>
-                        <h2 style={{ fontSize: "1.5rem", fontWeight: "700" }}>
-                            Welcome back, {user.email.split('@')[0]}!
+            <main className={styles.container}>
+                {/* Header Section */}
+                <header className={styles.dashboardHeader}>
+                    <div className={styles.welcomeSection}>
+                        <h2 className={styles.welcomeTitle}>
+                            Good day, {user.email.split('@')[0]}
                         </h2>
-                        <p style={{ color: "var(--muted-foreground)", fontSize: "0.875rem" }}>
-                            Here is what is happening with your tasks today.
+                        <p className={styles.welcomeSubtitle}>
+                            {isFormVisible ? "Fill in the details to add a task" : "Overview of your current workspace"}
                         </p>
                     </div>
 
-                    <div style={{
-                        display: "grid",
-                        gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
-                        gap: "1rem"
-                    }}>
-                        <div style={{
-                            padding: "1.5rem",
-                            background: "var(--background)",
-                            borderRadius: "var(--radius)",
-                            border: "1px solid var(--border)"
-                        }}>
-                            <span style={{ fontSize: "0.75rem", fontWeight: "600", color: "var(--muted-foreground)", textTransform: "uppercase", letterSpacing: "0.05em" }}>Total Tasks</span>
-                            <div style={{ fontSize: "1.5rem", fontWeight: "700", marginTop: "0.25rem" }}>0</div>
-                        </div>
-                        <div style={{
-                            padding: "1.5rem",
-                            background: "var(--background)",
-                            borderRadius: "var(--radius)",
-                            border: "1px solid var(--border)"
-                        }}>
-                            <span style={{ fontSize: "0.75rem", fontWeight: "600", color: "var(--muted-foreground)", textTransform: "uppercase", letterSpacing: "0.05em" }}>Completed</span>
-                            <div style={{ fontSize: "1.5rem", fontWeight: "700", marginTop: "0.25rem", color: "#10b981" }}>0</div>
-                        </div>
+                    <div className={styles.controls}>
+                        {!isFormVisible ? (
+                            <button
+                                onClick={() => setIsFormVisible(true)}
+                                className={styles.createBtn}
+                            >
+                                + New Task
+                            </button>
+                        ) : (
+                            <button
+                                onClick={() => setIsFormVisible(false)}
+                                className={styles.cancelBtn}
+                            >
+                                Cancel
+                            </button>
+                        )}
                     </div>
-                </div>
+                </header>
+
+                {/* Main Content Area */}
+                {!isFormVisible ? (
+                    <section className={styles.statsGrid}>
+                        <div className={styles.statCard}>
+                            <span className={styles.statLabel}>Active Projects</span>
+                            <div className={styles.statValue}>{tasks.length}</div>
+                        </div>
+                        <div className={styles.statCard}>
+                            <span className={styles.statLabel}>Completed Tasks</span>
+                            <div className={`${styles.statValue} ${styles.statValueAlt}`}>
+                                {tasks.filter(t => t.status === "Done").length}
+                            </div>
+                        </div>
+                    </section>
+                ) : (
+                    <section className={styles.formSection}>
+                        <TaskForm
+                            onSubmit={handleCreateTask}
+                            loading={taskLoading}
+                        />
+                    </section>
+                )}
             </main>
         </ProtectedRoute>
     );
