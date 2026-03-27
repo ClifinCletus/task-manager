@@ -1,15 +1,19 @@
 "use client";
 
-import { FiEdit2, FiTrash2, FiCalendar, FiClock } from "react-icons/fi";
+import { FiEdit2, FiTrash2, FiCalendar, FiClock, FiCheckCircle } from "react-icons/fi";
 import styles from "./TaskCard.module.css";
 import StatusBadge from "./StatusBadge";
 
-export default function TaskCard({ task, onEdit, onDelete }) {
+export default function TaskCard({ task, onEdit, onDelete, onStatusChange }) {
 
-    // Formatting Firestore date string
+   
     const formatDate = (dateStr) => {
         if (!dateStr) return "";
-        return new Date(dateStr).toLocaleDateString();
+        return new Date(dateStr).toLocaleDateString(undefined, {
+            day: 'numeric',
+            month: 'short',
+            year: 'numeric'
+        });
     };
 
     const getUrgencyClass = (urgency) => {
@@ -21,17 +25,23 @@ export default function TaskCard({ task, onEdit, onDelete }) {
         }
     };
 
+    const handleComplete = () => {
+        const nextStatus = task.status === "Done" ? "Todo" : "Done";
+        onStatusChange(task.id, nextStatus);
+    };
+
     return (
-        <article className={styles.card}>
+        <article className={`${styles.card} ${task.status === "Done" ? styles.cardDone : ""}`}>
             <header className={styles.header}>
                 <div className={styles.topInfo}>
+                    <button
+                        onClick={handleComplete}
+                        className={`${styles.statusToggle} ${task.status === "Done" ? styles.toggleDone : ""}`}
+                        title={task.status === "Done" ? "Mark as Todo" : "Mark as Done"}
+                    >
+                        {task.status === "Done" ? <FiCheckCircle size={18} /> : <div className={styles.circle} />}
+                    </button>
                     <StatusBadge status={task.status} />
-                    {task.createdAt && (
-                        <span className={styles.date}>
-                            <FiClock style={{ marginBottom: '-2px', marginRight: '4px' }} />
-                            {formatDate(task.createdAt)}
-                        </span>
-                    )}
                 </div>
                 <div className={`${styles.urgencyDot} ${getUrgencyClass(task.urgency)}`} title={`Urgency: ${task.urgency}`}></div>
             </header>
@@ -42,22 +52,33 @@ export default function TaskCard({ task, onEdit, onDelete }) {
                     {task.description || "No description provided."}
                 </p>
 
-                {task.tags && task.tags.length > 0 && (
-                    <div className={styles.tagGroup}>
-                        {task.tags.map((tag, idx) => (
-                            <span key={idx} className={styles.tag}>#{tag}</span>
-                        ))}
-                    </div>
-                )}
+                <div className={styles.metaRow}>
+                    {task.createdAt && (
+                        <span className={styles.dateChip}>
+                            <FiClock className={styles.metaIcon} />
+                            {formatDate(task.createdAt)}
+                        </span>
+                    )}
+                    {task.tags && task.tags.length > 0 && (
+                        <div className={styles.tagGroup}>
+                            {task.tags.map((tag, idx) => (
+                                <span key={idx} className={styles.tag}>#{tag}</span>
+                            ))}
+                        </div>
+                    )}
+                </div>
             </div>
 
             <footer className={styles.footer}>
-                {task.deadline && (
-                    <span className={styles.deadline}>
-                        <FiCalendar style={{ marginBottom: '-2px', marginRight: '4px' }} />
-                        {formatDate(task.deadline)}
-                    </span>
-                )}
+                <div className={styles.deadlineInfo}>
+                    {task.deadline ? (
+                        <span className={styles.deadline}>
+                            <FiCalendar className={styles.metaIcon} />
+                            <span style={{ fontSize: '0.625rem', opacity: 0.7, marginRight: '4px' }}>DUE:</span>
+                            {formatDate(task.deadline)}
+                        </span>
+                    ) : <span />} 
+                </div>
                 <div className={styles.actionGroup}>
                     <button
                         onClick={() => onEdit(task)}

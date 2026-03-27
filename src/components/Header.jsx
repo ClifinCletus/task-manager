@@ -13,7 +13,6 @@ export default function Header() {
 
     const handleLogout = async () => {
         try {
-            // The logout thunk already handles Firebase signOut and state clearing
             await dispatch(logout());
             router.push("/login");
         } catch (error) {

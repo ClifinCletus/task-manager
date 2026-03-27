@@ -3,7 +3,7 @@
 import styles from "./TaskList.module.css";
 import TaskCard from "./TaskCard";
 
-export default function TaskList({ tasks = [], onEdit, onDelete }) {
+export default function TaskList({ tasks = [], onEdit, onDelete, onStatusChange }) {
     if (!tasks || tasks.length === 0) {
         return (
             <div className={styles.emptyState}>
@@ -21,6 +21,7 @@ export default function TaskList({ tasks = [], onEdit, onDelete }) {
                     task={task}
                     onEdit={onEdit}
                     onDelete={onDelete}
+                    onStatusChange={onStatusChange}
                 />
             ))}
         </div>

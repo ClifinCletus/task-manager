@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo } from "react";
 import { useSelector, useDispatch } from "react-redux";
+import toast from "react-hot-toast";
 import ProtectedRoute from "@/components/protectedRoutes";
 import TaskForm from "@/components/TaskForm";
 import TaskList from "@/components/TaskList";
@@ -38,7 +39,6 @@ export default function Home() {
     const filteredTasks = useMemo(() => {
         let result = [...tasks];
 
-        // 1. Search Filter
         if (filters.search.trim()) {
             const query = filters.search.toLowerCase();
             result = result.filter(t =>
@@ -47,22 +47,18 @@ export default function Home() {
             );
         }
 
-        // 2. Status Filter
         if (filters.status) {
             result = result.filter(t => t.status === filters.status);
         }
 
-        // 3. Urgency Filter
         if (filters.urgency) {
             result = result.filter(t => t.urgency === filters.urgency);
         }
 
-        // 4. Tag Filter
         if (filters.tag) {
             result = result.filter(t => t.tags && t.tags.includes(filters.tag));
         }
 
-        // 5. Sorting Logic
         result.sort((a, b) => {
             if (filters.sort === "newest") {
                 return new Date(b.createdAt || 0) - new Date(a.createdAt || 0);
@@ -82,17 +78,28 @@ export default function Home() {
     }, [tasks, filters]);
 
     const handleFormSubmit = async (taskData) => {
-        if (editingTask) {
-            const result = await dispatch(updateTask({ id: editingTask.id, taskData }));
-            if (updateTask.fulfilled.match(result)) {
-                setIsFormVisible(false);
-                setEditingTask(null);
+        const loadingToast = toast.loading(editingTask ? "Updating task..." : "Creating task...");
+        try {
+            if (editingTask) {
+                const result = await dispatch(updateTask({ id: editingTask.id, taskData }));
+                if (updateTask.fulfilled.match(result)) {
+                    toast.success("Task updated successfully!", { id: loadingToast });
+                    setIsFormVisible(false);
+                    setEditingTask(null);
+                } else {
+                    toast.error("Failed to update task.", { id: loadingToast });
+                }
+            } else {
+                const result = await dispatch(createTask(taskData));
+                if (createTask.fulfilled.match(result)) {
+                    toast.success("Task created!", { id: loadingToast });
+                    setIsFormVisible(false);
+                } else {
+                    toast.error("Failed to create task.", { id: loadingToast });
+                }
             }
-        } else {
-            const result = await dispatch(createTask(taskData));
-            if (createTask.fulfilled.match(result)) {
-                setIsFormVisible(false);
-            }
+        } catch (error) {
+            toast.error("An unexpected error occurred.", { id: loadingToast });
         }
     };
 
@@ -101,9 +108,25 @@ export default function Home() {
         setIsFormVisible(true);
     };
 
-    const handleDeleteTask = (id) => {
+    const handleDeleteTask = async (id) => {
         if (window.confirm("Are you sure you want to delete this task?")) {
-            dispatch(deleteTask(id));
+            const loadingToast = toast.loading("Removing task...");
+            const result = await dispatch(deleteTask(id));
+            if (deleteTask.fulfilled.match(result)) {
+                toast.success("Task removed.", { id: loadingToast });
+            } else {
+                toast.error("Failed to delete task.", { id: loadingToast });
+            }
+        }
+    };
+
+    const handleToggleStatus = async (id, nextStatus) => {
+        const loadingToast = toast.loading(`Moving to ${nextStatus}...`);
+        const result = await dispatch(updateTask({ id, taskData: { status: nextStatus } }));
+        if (updateTask.fulfilled.match(result)) {
+            toast.success(`Task ${nextStatus === "Done" ? "completed!" : "re-opened."}`, { id: loadingToast });
+        } else {
+            toast.error("Update failed.", { id: loadingToast });
         }
     };
 
@@ -117,7 +140,6 @@ export default function Home() {
     return (
         <ProtectedRoute>
             <main className={styles.container}>
-                {/* Header Section */}
                 <header className={styles.dashboardHeader}>
                     <div className={styles.welcomeSection}>
                         <h2 className={styles.welcomeTitle}>
@@ -130,18 +152,12 @@ export default function Home() {
 
                     <div className={styles.controls}>
                         {!isFormVisible ? (
-                            <button
-                                onClick={() => setIsFormVisible(true)}
-                                className={styles.createBtn}
-                            >
+                            <button onClick={() => setIsFormVisible(true)} className={styles.createBtn}>
                                 <FiPlus style={{ marginRight: '8px' }} />
                                 New Task
                             </button>
                         ) : (
-                            <button
-                                onClick={handleCancel}
-                                className={styles.cancelBtn}
-                            >
+                            <button onClick={handleCancel} className={styles.cancelBtn}>
                                 <FiX style={{ marginRight: '8px' }} />
                                 Cancel
                             </button>
@@ -149,10 +165,8 @@ export default function Home() {
                     </div>
                 </header>
 
-                {/* Main Content Area */}
                 {!isFormVisible ? (
                     <>
-                        {/* Compact Stats Row */}
                         <section className={styles.statsGrid}>
                             <div className={styles.statCard}>
                                 <div className={styles.statInfo}>
@@ -170,7 +184,6 @@ export default function Home() {
                             </div>
                         </section>
 
-                        {/* Search and Filters Section */}
                         <section className={styles.listSection}>
                             <TaskFilters filters={filters} setFilters={setFilters} />
 
@@ -178,6 +191,7 @@ export default function Home() {
                                 tasks={filteredTasks}
                                 onEdit={handleEditTask}
                                 onDelete={handleDeleteTask}
+                                onStatusChange={handleToggleStatus}
                             />
                         </section>
                     </>

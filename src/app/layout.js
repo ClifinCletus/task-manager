@@ -1,33 +1,36 @@
-import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
-import { Providers } from "../utils/providers";
+import { Inter } from "next/font/google";
+import { Providers } from "@/utils/providers";
+import { Toaster } from "react-hot-toast";
 import Header from "@/components/Header";
+import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
-  title: "ProTask | Smart Task Management",
-  description: "Organize, track, and optimize your workflow with ProTask. The ultimate task manager for professionals.",
-  keywords: ["task management", "productivity", "workflow", "nextjs", "redux"],
-
+  title: "TaskFlow | Elite Task Management",
+  description: "Minimalist, high-performance task management for professionals.",
 };
-
-
 
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable}`}>
+      <body className={inter.className}>
         <Providers>
           <Header />
+          <Toaster
+            position="top-right"
+            toastOptions={{
+              duration: 3000,
+              style: {
+                background: '#09090b',
+                color: '#fff',
+                fontSize: '14px',
+                fontWeight: '600',
+                borderRadius: '8px',
+                border: '1px solid #27272a',
+              },
+            }}
+          />
           {children}
         </Providers>
       </body>
