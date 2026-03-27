@@ -39,6 +39,7 @@ export default function Home() {
     const filteredTasks = useMemo(() => {
         let result = [...tasks];
 
+        // 1. Search Filter
         if (filters.search.trim()) {
             const query = filters.search.toLowerCase();
             result = result.filter(t =>
@@ -47,19 +48,28 @@ export default function Home() {
             );
         }
 
+        // 2. Status Filter
         if (filters.status) {
             result = result.filter(t => t.status === filters.status);
         }
 
+        // 3. Urgency Filter
         if (filters.urgency) {
             result = result.filter(t => t.urgency === filters.urgency);
         }
 
+        // 4. Tag Filter
         if (filters.tag) {
             result = result.filter(t => t.tags && t.tags.includes(filters.tag));
         }
 
+        // 5. Sorting Logic (Pinned first, then selected sort)
         result.sort((a, b) => {
+            // Rule: Pinned tasks always win first
+            if (a.pinned && !b.pinned) return -1;
+            if (!a.pinned && b.pinned) return 1;
+
+            // Then follow selected sort order within the pinned/unpinned groups
             if (filters.sort === "newest") {
                 return new Date(b.createdAt || 0) - new Date(a.createdAt || 0);
             }
@@ -83,11 +93,11 @@ export default function Home() {
             if (editingTask) {
                 const result = await dispatch(updateTask({ id: editingTask.id, taskData }));
                 if (updateTask.fulfilled.match(result)) {
-                    toast.success("Task updated successfully!", { id: loadingToast });
+                    toast.success("Task updated!", { id: loadingToast });
                     setIsFormVisible(false);
                     setEditingTask(null);
                 } else {
-                    toast.error("Failed to update task.", { id: loadingToast });
+                    toast.error("Update failed.", { id: loadingToast });
                 }
             } else {
                 const result = await dispatch(createTask(taskData));
@@ -95,11 +105,11 @@ export default function Home() {
                     toast.success("Task created!", { id: loadingToast });
                     setIsFormVisible(false);
                 } else {
-                    toast.error("Failed to create task.", { id: loadingToast });
+                    toast.error("Creation failed.", { id: loadingToast });
                 }
             }
         } catch (error) {
-            toast.error("An unexpected error occurred.", { id: loadingToast });
+            toast.error("Unexpected error.", { id: loadingToast });
         }
     };
 
@@ -109,13 +119,13 @@ export default function Home() {
     };
 
     const handleDeleteTask = async (id) => {
-        if (window.confirm("Are you sure you want to delete this task?")) {
+        if (window.confirm("Are you sure?")) {
             const loadingToast = toast.loading("Removing task...");
             const result = await dispatch(deleteTask(id));
             if (deleteTask.fulfilled.match(result)) {
                 toast.success("Task removed.", { id: loadingToast });
             } else {
-                toast.error("Failed to delete task.", { id: loadingToast });
+                toast.error("Removal failed.", { id: loadingToast });
             }
         }
     };
@@ -124,9 +134,27 @@ export default function Home() {
         const loadingToast = toast.loading(`Moving to ${nextStatus}...`);
         const result = await dispatch(updateTask({ id, taskData: { status: nextStatus } }));
         if (updateTask.fulfilled.match(result)) {
-            toast.success(`Task ${nextStatus === "Done" ? "completed!" : "re-opened."}`, { id: loadingToast });
+            toast.success("Status updated.", { id: loadingToast });
         } else {
             toast.error("Update failed.", { id: loadingToast });
+        }
+    };
+
+    const handlePinToggle = async (task) => {
+        const currentlyPinned = tasks.filter(t => t.pinned).length;
+
+        if (!task.pinned && currentlyPinned >= 2) {
+            toast.error("Maximum 2 tasks can be pinned.");
+            return;
+        }
+
+        const loadingToast = toast.loading(task.pinned ? "Unpinning..." : "Pinning to top...");
+        const result = await dispatch(updateTask({ id: task.id, taskData: { pinned: !task.pinned } }));
+
+        if (updateTask.fulfilled.match(result)) {
+            toast.success(task.pinned ? "Task unpinned." : "Task pinned to top!", { id: loadingToast });
+        } else {
+            toast.error("Action failed.", { id: loadingToast });
         }
     };
 
@@ -192,6 +220,7 @@ export default function Home() {
                                 onEdit={handleEditTask}
                                 onDelete={handleDeleteTask}
                                 onStatusChange={handleToggleStatus}
+                                onPinToggle={handlePinToggle}
                             />
                         </section>
                     </>

@@ -1,12 +1,12 @@
 "use client";
 
-import { FiEdit2, FiTrash2, FiCalendar, FiClock, FiCheckCircle } from "react-icons/fi";
+import { FiEdit2, FiTrash2, FiCalendar, FiClock, FiCheckCircle, FiShare2 } from "react-icons/fi";
+import { BsPinAngle, BsPinAngleFill } from "react-icons/bs";
 import styles from "./TaskCard.module.css";
 import StatusBadge from "./StatusBadge";
 
-export default function TaskCard({ task, onEdit, onDelete, onStatusChange }) {
+export default function TaskCard({ task, onEdit, onDelete, onStatusChange, onPinToggle }) {
 
-   
     const formatDate = (dateStr) => {
         if (!dateStr) return "";
         return new Date(dateStr).toLocaleDateString(undefined, {
@@ -31,7 +31,7 @@ export default function TaskCard({ task, onEdit, onDelete, onStatusChange }) {
     };
 
     return (
-        <article className={`${styles.card} ${task.status === "Done" ? styles.cardDone : ""}`}>
+        <article className={`${styles.card} ${task.status === "Done" ? styles.cardDone : ""} ${task.pinned ? styles.cardPinned : ""}`}>
             <header className={styles.header}>
                 <div className={styles.topInfo}>
                     <button
@@ -43,7 +43,17 @@ export default function TaskCard({ task, onEdit, onDelete, onStatusChange }) {
                     </button>
                     <StatusBadge status={task.status} />
                 </div>
-                <div className={`${styles.urgencyDot} ${getUrgencyClass(task.urgency)}`} title={`Urgency: ${task.urgency}`}></div>
+
+                <div className={styles.rightControls}>
+                    <button
+                        onClick={() => onPinToggle(task)}
+                        className={`${styles.pinBtn} ${task.pinned ? styles.pinActive : ""}`}
+                        title={task.pinned ? "Unpin task" : "Pin to top (Max 2)"}
+                    >
+                        {task.pinned ? <BsPinAngleFill size={16} /> : <BsPinAngle size={16} />}
+                    </button>
+                    <div className={`${styles.urgencyDot} ${getUrgencyClass(task.urgency)}`} title={`Urgency: ${task.urgency}`}></div>
+                </div>
             </header>
 
             <div className={styles.content}>
@@ -77,7 +87,7 @@ export default function TaskCard({ task, onEdit, onDelete, onStatusChange }) {
                             <span style={{ fontSize: '0.625rem', opacity: 0.7, marginRight: '4px' }}>DUE:</span>
                             {formatDate(task.deadline)}
                         </span>
-                    ) : <span />} 
+                    ) : <span />}
                 </div>
                 <div className={styles.actionGroup}>
                     <button
