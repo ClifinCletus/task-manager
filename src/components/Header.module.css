@@ -1,21 +1,21 @@
 .header {
     width: 100%;
-    height: 64px;
+    height: 72px;
     background-color: var(--card);
-    border-bottom: 1px solid var(--border);
+    border-bottom: 2px solid var(--border);
     display: flex;
     align-items: center;
     justify-content: center;
     position: sticky;
     top: 0;
     z-index: 50;
-    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    padding: 10px;
 }
 
 .nav {
     width: 100%;
-    max-width: 1280px;
-    padding: 0 1.5rem;
+    max-width: 1200px;
+    padding: 0 2rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -24,21 +24,21 @@
 .logoArea {
     display: flex;
     align-items: center;
-    gap: 0.75rem;
 }
 
 .logo {
-    font-size: 1.25rem;
-    font-weight: 700;
-    color: var(--primary);
+    font-size: 1.5rem;
+    font-weight: 900;
+    color: var(--foreground);
     text-decoration: none;
-    letter-spacing: -0.025em;
+    letter-spacing: -0.06em;
+    text-transform: lowercase;
 }
 
 .userArea {
     display: flex;
     align-items: center;
-    gap: 1.25rem;
+    gap: 2rem;
 }
 
 .userInfo {
@@ -48,34 +48,43 @@
 }
 
 .userName {
-    font-size: 0.875rem;
-    font-weight: 600;
+    font-size: 0.8125rem;
+    font-weight: 800;
     color: var(--foreground);
-    line-height: 1.25;
+    line-height: 1;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
 }
 
 .userEmail {
     font-size: 0.75rem;
     color: var(--muted-foreground);
-    line-height: 1;
+    margin-top: 0.25rem;
 }
 
 .logoutBtn {
-    padding: 0.5rem 1rem;
-    background-color: #ef4444;
-    color: #ffffff;
-    font-size: 0.875rem;
-    font-weight: 600;
+    padding: 0.625rem 1.25rem;
+    background-color: rgb(164, 164, 227);
+    border: 1px solid var(--border);
+    color: var(--foreground);
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
     border-radius: var(--radius);
-    transition: background-color 0.2s;
+    transition: all 0.2s;
 }
 
 .logoutBtn:hover {
-    background-color: #dc2626;
+    background-color: #ef4444;
+    color: #ffffff;
+    border-color: #ef4444;
 }
 
 @media (max-width: 640px) {
-    .userName {
+
+    .userName,
+    .userEmail {
         display: none;
     }
 }
